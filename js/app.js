@@ -26,14 +26,14 @@ console.log(menu);
 
 let user=prompt("¡Bienvenidos a Don Corleone!"+"\n"+"Si usted desea comprar nuestros productos, por favor seleccione cualquier tecla."+"\n"+"Si usted es el administrador, por favor coloque su contraseña.");
 if(user==="1234"){
-    let act=prompt("Este es el menu actual. Desea actualizar el Dolar o agregar un nuevo Producto? D/P"+"\n"+"Si desea salir del menu apriete N."+"\n"+mostrarMenu(menu, true));
+    let act=prompt("Este es el menu actual. ¿Desea actualizar el Dolar o agregar un nuevo Producto? D/P"+"\n"+"Si desea salir del menu apriete N."+"\n"+mostrarMenu(menu, true));
     act = act.toUpperCase()
     console.log(act!=="N")
     while(act!=="N"){
         switch(act){
             case "D":
                 let dolarHoy=prompt("Inserte valor del dolar actual");
-                dolarHoy = validarNumero();
+                dolarHoy = validarNumero(dolarHoy);
                 // menu.forEach((el) => el.precio=Math.floor(el.precio*dolarHoy/el.dolarAntes)) //Sin metodo del objeto Carta
                 menu.forEach((el) => el.actualizarValor(dolarHoy))
                 menu.forEach((el) => el.dolarAntes=dolarHoy)
@@ -42,15 +42,15 @@ if(user==="1234"){
             case "P":
                 let nuevoGusto = prompt("Ingrese el gusto del nuevo producto");
                 let nuevoPrecio = parseFloat(prompt("Ingrese el precio del nuevo producto"));
-                nuevoPrecio = validarNumero();
-                let nuevoDolar = parseFloat(prompt("Ingrese el valor del dolar para nuevo producto"));
-                nuevoDolar=validarNumero();
+                nuevoPrecio = validarNumero(nuevoPrecio);
+                let nuevoDolar = parseFloat(prompt("Ingrese el valor del dolar para el nuevo producto"));
+                nuevoDolar=validarNumero(nuevoDolar);
                 Carta.contador++;
                 menu.push(new Carta (Carta.contador, nuevoGusto, nuevoPrecio, nuevoDolar));
                 alert("Nuevo producto producto agregado. El menu actualizado es:"+ "\n" + mostrarMenu(menu, true))
             break
         }
-        act=prompt("Desea realizar otro cambio? P: Producto, D: Dolar, N: Salir")
+        act=prompt("¿Desea realizar otro cambio? P: Producto, D: Dolar, N: Salir")
         act = act.toUpperCase()
     }
 };
@@ -136,9 +136,11 @@ function agregarAlCarrito (carrito, pizza, cantidad) {
 }
 
 function validarNumero(valor) {
-    do {
+    console.log(valor)
+    console.log(isNaN(valor))
+    while(isNaN(valor)){
         valor = parseFloat(prompt("Por favor, inserte un valor númerico"));
-    } while (isNaN(valor));
+    }
 
     return valor; // Devuelve el valor validado
 }
