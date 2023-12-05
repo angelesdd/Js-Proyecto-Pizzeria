@@ -1,6 +1,4 @@
-
-let sumaPrecio = 0;
-let dolarAyer = 350
+let dolarAyer = 350;
 
 class Carta {
     constructor(id, gustos, precio, dolarAntes) {
@@ -22,125 +20,236 @@ menu.push(new Carta (Carta.contador, "Napolitana", 2000, dolarAyer));
 Carta.contador++
 menu.push(new Carta (Carta.contador, "Pizza de Pollo", 2500, dolarAyer));
 
-console.log(menu);
+sessionStorage.clear() //Limpiamos el storage
 
-let user=prompt("¡Bienvenidos a Don Corleone!"+"\n"+"Si usted desea comprar nuestros productos, por favor seleccione cualquier tecla."+"\n"+"Si usted es el administrador, por favor coloque su contraseña.");
-if(user==="1234"){
-    let act=prompt("Este es el menu actual. ¿Desea actualizar el Dolar o agregar un nuevo Producto? D/P"+"\n"+"Si desea salir del menu apriete N."+"\n"+mostrarMenu(menu, true));
-    act = act.toUpperCase()
-    console.log(act!=="N")
-    while(act!=="N"){
-        switch(act){
-            case "D":
-                let dolarHoy=prompt("Inserte valor del dolar actual");
-                dolarHoy = validarNumero(dolarHoy);
-                // menu.forEach((el) => el.precio=Math.floor(el.precio*dolarHoy/el.dolarAntes)) //Sin metodo del objeto Carta
-                menu.forEach((el) => el.actualizarValor(dolarHoy))
-                menu.forEach((el) => el.dolarAntes=dolarHoy)
-                alert("Se actualizo el valor del dolar. El menu actualizado es:"+ "\n" + mostrarMenu(menu, true))
-            break
-            case "P":
-                let nuevoGusto = prompt("Ingrese el gusto del nuevo producto");
-                let nuevoPrecio = parseFloat(prompt("Ingrese el precio del nuevo producto"));
-                nuevoPrecio = validarNumero(nuevoPrecio);
-                let nuevoDolar = parseFloat(prompt("Ingrese el valor del dolar para el nuevo producto"));
-                nuevoDolar=validarNumero(nuevoDolar);
-                Carta.contador++;
-                menu.push(new Carta (Carta.contador, nuevoGusto, nuevoPrecio, nuevoDolar));
-                alert("Nuevo producto producto agregado. El menu actualizado es:"+ "\n" + mostrarMenu(menu, true))
-            break
-        }
-        act=prompt("¿Desea realizar otro cambio? P: Producto, D: Dolar, N: Salir")
-        act = act.toUpperCase()
+let introduccion = document.createElement('div');
+introduccion.className='firstdiv';
+introduccion.innerHTML=`<h1 class="titulointroduccion">Bienvenidos a Don Corleone</h1><h2>Soy el primer subtitulo</h2>`; //Inner HTML es contenido HTML
+document.body.appendChild(introduccion);
+
+let autenticacion = document.createElement('form');
+autenticacion.className='autenticacion container_fluid';
+autenticacion.innerHTML=`<h3>Ingrese su contraseña si es admin, o no ingrese nada si es cliente</h3>
+<label for="contraseña">Ingrese contraseña: <input type="password" class="contraseña" id="contraseña"></label>
+<input type="submit" id="ingresarContraseña" value="Ingresar">`;
+document.body.appendChild(autenticacion);
+autenticacion.addEventListener("submit", validarContraseña)
+
+
+let menuAdmin = document.createElement('div');
+
+let formularioDolar = document.createElement('form');
+formularioDolar.innerHTML = `<h3>Formulario para actualizar dolar</h3>
+<label for="nuevoDolar">Ingrese nuevo dolar: <input type="number" required min="0" step="any" id="nuevoDolar"></label>
+<input type="submit" id="actualizarDolar" value="Actualizar">`;
+formularioDolar.addEventListener("submit", actualizarDolar)
+
+let formularioProducto = document.createElement('form');
+formularioProducto.innerHTML = `<h3>Formulario para nuevo gusto</h3>
+<label for="nuevoGusto">Ingrese nuevo gusto: <input type="text" required id="nuevoGusto"></label><br>
+<label for="nuevoPrecio">Ingrese nuevo precio: <input type="number" required min="0" step="any" id="nuevoPrecio"></label><br>
+<label for="nuevoDolarProducto">Ingrese valor del dolar: <input type="number" required min="0" step="any" id="nuevoDolarProducto"></label><br>
+<input type="submit" id="agregarProducto" value="Agregar">`;
+formularioProducto.addEventListener("submit", agregarProducto)
+
+let cartaAdmin = document.createElement('div');
+actualizarCartaAdmin()
+
+let salirAdmin = document.createElement('button');
+salirAdmin.innerText = 'Salir';
+salirAdmin.addEventListener("click", salirMenuAdmin)
+
+let menuCompra = document.createElement('div');
+menuCompra.innerHTML = `<h2>¿Qué desea comprar?</h2>`
+
+let cartaCompra = document.createElement('div');
+
+let carritoHTML = document.createElement('aside');
+carritoHTML.id = 'Carrito_cliente'
+
+
+function validarContraseña(e){
+    e.preventDefault(); //Evitamos el comportamiento por defecto de la etiqueta form
+    let formularioContraseña = e.target
+    // console.log(formularioContraseña.children[1].children[0])
+    let inputContraseña = document.getElementById('contraseña').value
+    console.log(inputContraseña)
+    autenticacion.remove()
+    if(inputContraseña === '1234'){
+        document.body.appendChild(menuAdmin);
+        menuAdmin.appendChild(formularioDolar);
+        menuAdmin.appendChild(formularioProducto);
+        menuAdmin.appendChild(cartaAdmin);
+        menuAdmin.appendChild(salirAdmin);
+    }else{
+        document.body.appendChild(menuCompra);
+        menuCompra.appendChild(cartaCompra);
     }
-};
+}
 
-console.log(menu)
+function actualizarCartaAdmin (){
+    cartaAdmin.innerHTML = `<h2>Carta actualizada</h2>`
+    menu.forEach(el => {
+        cartaAdmin.innerHTML = cartaAdmin.innerHTML + `<br>
+        <span>ID: ${el.id}</span><br>
+        <span>Gusto: ${el.gustos}</span><br>
+        <span>Precio: ${el.precio}</span><br>
+        <span>Dolar: ${el.dolarAntes}</span><br>`
+    })
+}
 
-const carrito = []
+function actualizarDolar(e){
+    e.preventDefault();
+    let nuevoDolar = document.getElementById('nuevoDolar').value;
+    console.log(nuevoDolar);
+    menu.forEach((el) => el.actualizarValor(nuevoDolar))
+    menu.forEach((el) => el.dolarAntes=nuevoDolar)
+    actualizarCartaAdmin ()
+}
 
-let control = prompt("¿Desea realizar algún pedido? S/N");
-while (control !== "n" && control !== "N") {
-    if (control === "s" || control === "S") {
-        let opcPizza = parseInt(prompt("¿Qué pizza desea comprar?"+ "\n" + mostrarMenu(menu, false)));
-        let ctrlPizza = menu.find((el) => el.id===opcPizza);
-        console.log(ctrlPizza);
-        //Si ctrlPizza existe, ejecutamos calcularPrecio. Si es undefined mostramos el prompt
-        if(ctrlPizza){
-            let cantidad = validarCantidad();
-            agregarAlCarrito(carrito, ctrlPizza, cantidad)
-            control = prompt("Su carrito es:"+"\n"+mostrarCarrito(carrito)+"¿Desea realizar algún otro pedido? S/N");
-        } else{
-            control = prompt("No ha seleccionado una opción válida. ¿Desea continuar con su pedido? S/N");
-        }
-    } else {
-        alert("Por favor, ingrese 'N' si desea salir y 'S' si desea continuar con su compra");
-        control = prompt("¿Desea realizar algún pedido? S/N");
+function agregarProducto(e){
+    e.preventDefault();
+    let nuevoGusto =document.getElementById('nuevoGusto').value;
+    let nuevoPrecio =document.getElementById('nuevoPrecio').value;
+    let nuevoDolarProducto =document.getElementById('nuevoDolarProducto').value;
+    Carta.contador++
+    menu.push(new Carta (Carta.contador, nuevoGusto, nuevoPrecio, nuevoDolarProducto));
+    actualizarCartaAdmin ()        
+}
+
+function salirMenuAdmin(e){
+    e.preventDefault();
+    menuAdmin.remove()
+    document.body.appendChild(menuCompra);
+    actualizarCartaCompra()
+    menuCompra.appendChild(cartaCompra);
+}
+
+function actualizarCartaCompra(){
+    cartaCompra.innerHTML=`<h2>Carta</h2>`;
+    for (const item of menu){
+        let card = document.createElement('form')
+        card.className=`Card_${item.id}`
+        card.innerHTML = 
+        ` Gusto: ${item.gustos} <br>
+        Precio: ${item.precio}
+        <input type="number" min="0.5" step="0.5" name="${item.id}" inputmode="numeric" id="Input_${item.id}" value="0">
+        <input type="submit" id="agregarProducto_${item.id}" value="Agregar al carrito">
+        <hr>
+        `
+        card.addEventListener('submit', agregarAlCarrito)
+        cartaCompra.appendChild(card)
     }
 }
 
-sumaPrecio = carrito.reduce((acumulador, el) => acumulador + el.precio*el.cantidad, 0)
+function agregarAlCarrito(e){
+    e.preventDefault();
+    let formularioActivo = e.target; //Aislamos el formulario que ejecuto este evento
+    let inputActivo = formularioActivo.children[1]; //Conociendo la estructura del form, accedemos al input numerico
+    let idPizza = parseInt(inputActivo.name); //El name del input coincide con el id de la pízza
+    let cantidadPizza = parseFloat(inputActivo.value); //Sacamos la cantidad de pizza a comprar
+    let pizza = menu.find((el) => el.id===idPizza) //Siempre va a encontrar una pizza
+    
+    let carrito = JSON.parse(sessionStorage.getItem("Carrito"));
+    console.log(carrito)
+    if(carrito==null){
+        carrito=[] //Si no tenemos items en el storage, este devuelve null. En ese caso lo cambiamos por [] para continuar el codigo
+    }
+    console.log(carrito)
 
-if(sumaPrecio>0){
-    alert("Su carrito es:"+"\n"+mostrarCarrito(carrito)+"Muchas gracias por confiar en nosotros. El total de su compra es $" + sumaPrecio);
-}
-
-function validarCantidad(){
-        let cantPizza = prompt("Ingrese la cantidad de pizzas que desea comprar");
-        cantPizza = parseFloat(cantPizza);
-        if((cantPizza%1===0 || cantPizza%1===0.5) && cantPizza>0){
-            alert("La cantidad elegida es "+cantPizza);
-        }else{
-                while((cantPizza%1!==0 && cantPizza%1!==0.5)|| cantPizza<=0){
-                    cantPizza=prompt("Ups! Parece que ha ingresado una opcion que no es valida. Puede elegir si desea comprar pizzas enteras o medias pizzas (1/2) ");
-                }
-                alert("La cantidad elegida es "+cantPizza);
-            
-        }   
-return cantPizza;
-}
-
-function mostrarMenu (array, mostrarDolar) {
-    let mensaje = "";
-    array.forEach(element => {
-        if (mostrarDolar){
-            mensaje = mensaje + element.id + ". "+ element.gustos +" Precio: $"+element.precio + " Dolar: U$D"+element.dolarAntes +"\n"
-        }else{
-            mensaje = mensaje + element.id + ". "+ element.gustos +" Precio: $"+element.precio + "\n"
-        }
-    });
-    return mensaje
-}
-
-function mostrarCarrito (array) {
-    let mensaje = "";
-    array.forEach(element => {
-            mensaje = mensaje + element.gustos + " Cantidad: " + element.cantidad +" Precio: $"+element.precio + "\n"
-    });
-    return mensaje
-}
-
-function agregarAlCarrito (carrito, pizza, cantidad) {
     let indice = carrito.findIndex((el) => el.id === pizza.id)
     if (indice === -1){
         let nuevaPizza = {
             id: pizza.id,
             gustos: pizza.gustos,
             precio: pizza.precio,
-            cantidad: cantidad
+            cantidad: cantidadPizza
         }
         carrito.push(nuevaPizza)
     } else {
-        carrito[indice].cantidad+=cantidad
+        carrito[indice].cantidad+=cantidadPizza
+    }
+
+    console.log(carrito)
+    const enJSON = JSON.stringify(carrito);
+    guardarSesion("Carrito", enJSON);
+
+    mostrarCarrito()
+}
+
+function mostrarCarrito(){
+    let existeCarrito = document.getElementById('Carrito_cliente') //Si en el HTML no existe el carrito, lo creamos
+    let carrito = JSON.parse(sessionStorage.getItem("Carrito"));
+    if(!existeCarrito){
+        document.body.appendChild(carritoHTML)
+    }
+    console.log(carrito)
+    if(carrito.length===0){ 
+        existeCarrito.remove() //Si el carrito esta vacio, no mostramos la seccion carrito
+    } else{
+    carritoHTML.innerHTML=`<h3>Su carrito es:</h3>`
+    let contenidoCarrito = document.createElement('div')
+    contenidoCarrito.innerHTML = ''
+    let i = 0
+    carrito.map(p=>{
+        let itemCarrito = document.createElement('div')
+        itemCarrito.id = `Item_${p.id}`
+        itemCarrito.innerHTML =`
+        Gusto: ${p.gustos}<br>
+        Cantidad: ${p.cantidad}<br>
+        Precio: ${p.precio}<br>
+        Subtotal: ${p.cantidad*p.precio}<br><br>`
+        contenidoCarrito.appendChild(itemCarrito)
+        let botonItemCarrito = document.createElement('button')
+        botonItemCarrito.id=`Boton_${i}`
+        botonItemCarrito.innerText='Eliminar del carrito'
+        botonItemCarrito.addEventListener('click', eliminarItemCarrito)
+        itemCarrito.appendChild(botonItemCarrito)
+        i++
+    })
+    carritoHTML.appendChild(contenidoCarrito)
+    let botonCarrito = document.createElement('button')
+    botonCarrito.innerText='Finalizar compra'
+    botonCarrito.addEventListener('click', finalizarCompra)
+    carritoHTML.appendChild(botonCarrito)  
+    let botonCarrito2 = document.createElement('button')
+    botonCarrito2.innerText='Limpiar carrito'
+    botonCarrito2.addEventListener('click', limpiarCarrito)
+    carritoHTML.appendChild(botonCarrito2)      
     }
 }
 
-function validarNumero(valor) {
-    console.log(valor)
-    console.log(isNaN(valor))
-    while(isNaN(valor)){
-        valor = parseFloat(prompt("Por favor, inserte un valor númerico"));
-    }
-
-    return valor; // Devuelve el valor validado
+function finalizarCompra(){
+    document.body.innerHTML = '' //Limpiamos el body
+    let carrito = JSON.parse(sessionStorage.getItem("Carrito"));
+    let totalCompra = carrito.reduce((acumulador, el) => acumulador + el.precio*el.cantidad, 0)
+    let mensaje = document.createElement('div')
+    mensaje.innerHTML = `
+    Gracias por confiar en nosotros <br>
+    Su total es: $${totalCompra} <br>
+    El ID de su pedido es: dbsa`
+    document.body.appendChild(mensaje)
 }
+
+function eliminarItemCarrito(e){
+    let boton = e.target; //Extraemos el boton que activo el evento
+    let idBoton = boton.id; //Obtenemos el id del boton: Boton_n siendo n su posicion
+    let posicionProducto = idBoton.substring(6) //Obtenemos n
+    let carrito = JSON.parse(sessionStorage.getItem("Carrito"));
+    carrito.splice(posicionProducto,1) //Eliminamos el enenismo elemento del carrito
+    const enJSON = JSON.stringify(carrito);
+    guardarSesion("Carrito", enJSON);
+    mostrarCarrito()
+}
+
+function limpiarCarrito(e){
+    let carrito = []
+    const enJSON = JSON.stringify(carrito);
+    guardarSesion("Carrito", enJSON);
+    mostrarCarrito()
+}
+
+//Funciones del storage
+const guardarSesion = (clave, valor) => { sessionStorage.setItem(clave, valor) };
+
+
