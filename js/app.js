@@ -24,12 +24,12 @@ sessionStorage.clear() //Limpiamos el storage
 
 let introduccion = document.createElement('div');
 introduccion.className='firstdiv';
-introduccion.innerHTML=`<h1 class="titulointroduccion">Bienvenidos a Don Corleone</h1><h2>Soy el primer subtitulo</h2>`; //Inner HTML es contenido HTML
+introduccion.innerHTML=`<h1 class="titulointroduccion">Bienvenidos a Don Corleone</h1>`; //Inner HTML es contenido HTML
 document.body.appendChild(introduccion);
 
 let autenticacion = document.createElement('form');
 autenticacion.className='autenticacion container_fluid';
-autenticacion.innerHTML=`<h3>Ingrese su contraseña si es admin, o no ingrese nada si es cliente</h3>
+autenticacion.innerHTML=`<h3>Ingrese cualquier tecla si desea realizar una compra.</h3><h4>Si usted es el administrador, por favor ingrese su contraseña</h4>
 <label for="contraseña">Ingrese contraseña: <input type="password" class="contraseña" id="contraseña"></label>
 <input type="submit" id="ingresarContraseña" value="Ingresar">`;
 document.body.appendChild(autenticacion);
