@@ -83,6 +83,7 @@ function validarContraseña(e){
         menuAdmin.appendChild(salirAdmin);
     }else{
         document.body.appendChild(menuCompra);
+        actualizarCartaCompra();
         menuCompra.appendChild(cartaCompra);
     }
 }
