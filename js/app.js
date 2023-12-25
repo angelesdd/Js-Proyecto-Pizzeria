@@ -1,5 +1,3 @@
-let dolarAyer = 350;
-
 class Carta {
     constructor(id, gustos, precio, dolarAntes) {
         this.id = parseInt(id);
@@ -13,12 +11,25 @@ class Carta {
     }
 }
 
-const menu = [];
-menu.push(new Carta (Carta.contador, "Pizza de Jamon y Queso", 1250, dolarAyer));
-Carta.contador++
-menu.push(new Carta (Carta.contador, "Napolitana", 2000, dolarAyer));
-Carta.contador++
-menu.push(new Carta (Carta.contador, "Pizza de Pollo", 2500, dolarAyer));
+let menu = [];
+
+async function cargarMenu (){
+    try {
+        let result = await fetch('menu.json');
+        let data = await result.json()
+        data.forEach(el => {
+            menu.push(new Carta (Carta.contador, el.gustos, el.precio, el.dolarAntes))
+            Carta.contador++
+        })
+        console.log(menu)
+        document.body.appendChild(autenticacion);
+    } catch (error) {
+        let errorDocumento = document.createElement('div')
+        errorDocumento.innerHTML='<span>Ocurrio un error inesperado. Por favor, intente ingresar mas tarde. Disculpe las molestias.</span>'
+        document.body.appendChild(errorDocumento)
+        console.log(error.message)
+    }
+}
 
 sessionStorage.clear() //Limpiamos el storage
 
@@ -29,51 +40,55 @@ document.body.appendChild(introduccion);
 
 let autenticacion = document.createElement('form');
 autenticacion.className='autenticacion container_fluid';
-autenticacion.innerHTML=`<h3>Ingrese cualquier tecla si desea realizar una compra.</h3><h4>Si usted es el administrador, por favor ingrese su contraseña</h4>
+autenticacion.innerHTML=`<h3>Ingrese cualquier tecla si desea realizar una compra.</h3><h5>Si usted es el administrador, por favor ingrese su contraseña.</h5>
 <label for="contraseña">Ingrese contraseña: <input type="password" class="contraseña" id="contraseña"></label>
 <input type="submit" id="ingresarContraseña" value="Ingresar">`;
-document.body.appendChild(autenticacion);
+cargarMenu();
 autenticacion.addEventListener("submit", validarContraseña)
 
-
 let menuAdmin = document.createElement('div');
+menuAdmin.className='menuAdmin';
 
 let formularioDolar = document.createElement('form');
+formularioDolar.className='formularioDolar container_fluid';
 formularioDolar.innerHTML = `<h3>Formulario para actualizar dolar</h3>
 <label for="nuevoDolar">Ingrese nuevo dolar: <input type="number" required min="0" step="any" id="nuevoDolar"></label>
 <input type="submit" id="actualizarDolar" value="Actualizar">`;
 formularioDolar.addEventListener("submit", actualizarDolar)
 
 let formularioProducto = document.createElement('form');
+formularioProducto.className='formularioProducto';
 formularioProducto.innerHTML = `<h3>Formulario para nuevo gusto</h3>
 <label for="nuevoGusto">Ingrese nuevo gusto: <input type="text" required id="nuevoGusto"></label><br>
 <label for="nuevoPrecio">Ingrese nuevo precio: <input type="number" required min="0" step="any" id="nuevoPrecio"></label><br>
 <label for="nuevoDolarProducto">Ingrese valor del dolar: <input type="number" required min="0" step="any" id="nuevoDolarProducto"></label><br>
 <input type="submit" id="agregarProducto" value="Agregar">`;
-formularioProducto.addEventListener("submit", agregarProducto)
+formularioProducto.addEventListener("submit", agregarProducto);
 
 let cartaAdmin = document.createElement('div');
-actualizarCartaAdmin()
+cartaAdmin.className='cartaAdmin';
 
 let salirAdmin = document.createElement('button');
+salirAdmin.className='salirAdmin';
 salirAdmin.innerText = 'Salir';
 salirAdmin.addEventListener("click", salirMenuAdmin)
 
 let menuCompra = document.createElement('div');
+menuCompra.className='menuCompra';
 menuCompra.innerHTML = `<h2>¿Qué desea comprar?</h2>`
 
 let cartaCompra = document.createElement('div');
 
 let carritoHTML = document.createElement('aside');
+carritoHTML.className='carritoHTML';
 carritoHTML.id = 'Carrito_cliente'
-
 
 function validarContraseña(e){
     e.preventDefault(); //Evitamos el comportamiento por defecto de la etiqueta form
     let formularioContraseña = e.target
+    actualizarCartaAdmin()
     // console.log(formularioContraseña.children[1].children[0])
     let inputContraseña = document.getElementById('contraseña').value
-    console.log(inputContraseña)
     autenticacion.remove()
     if(inputContraseña === '1234'){
         document.body.appendChild(menuAdmin);
@@ -83,7 +98,7 @@ function validarContraseña(e){
         menuAdmin.appendChild(salirAdmin);
     }else{
         document.body.appendChild(menuCompra);
-        actualizarCartaCompra();
+        actualizarCartaCompra()
         menuCompra.appendChild(cartaCompra);
     }
 }
@@ -102,7 +117,6 @@ function actualizarCartaAdmin (){
 function actualizarDolar(e){
     e.preventDefault();
     let nuevoDolar = document.getElementById('nuevoDolar').value;
-    console.log(nuevoDolar);
     menu.forEach((el) => el.actualizarValor(nuevoDolar))
     menu.forEach((el) => el.dolarAntes=nuevoDolar)
     actualizarCartaAdmin ()
@@ -113,8 +127,8 @@ function agregarProducto(e){
     let nuevoGusto =document.getElementById('nuevoGusto').value;
     let nuevoPrecio =document.getElementById('nuevoPrecio').value;
     let nuevoDolarProducto =document.getElementById('nuevoDolarProducto').value;
-    Carta.contador++
     menu.push(new Carta (Carta.contador, nuevoGusto, nuevoPrecio, nuevoDolarProducto));
+    Carta.contador++
     actualizarCartaAdmin ()        
 }
 
@@ -152,11 +166,9 @@ function agregarAlCarrito(e){
     let pizza = menu.find((el) => el.id===idPizza) //Siempre va a encontrar una pizza
     
     let carrito = JSON.parse(sessionStorage.getItem("Carrito"));
-    console.log(carrito)
     if(carrito==null){
         carrito=[] //Si no tenemos items en el storage, este devuelve null. En ese caso lo cambiamos por [] para continuar el codigo
     }
-    console.log(carrito)
 
     let indice = carrito.findIndex((el) => el.id === pizza.id)
     if (indice === -1){
@@ -171,7 +183,6 @@ function agregarAlCarrito(e){
         carrito[indice].cantidad+=cantidadPizza
     }
 
-    console.log(carrito)
     const enJSON = JSON.stringify(carrito);
     guardarSesion("Carrito", enJSON);
 
@@ -184,7 +195,6 @@ function mostrarCarrito(){
     if(!existeCarrito){
         document.body.appendChild(carritoHTML)
     }
-    console.log(carrito)
     if(carrito.length===0){ 
         existeCarrito.remove() //Si el carrito esta vacio, no mostramos la seccion carrito
     } else{
@@ -210,6 +220,7 @@ function mostrarCarrito(){
     })
     carritoHTML.appendChild(contenidoCarrito)
     let botonCarrito = document.createElement('button')
+    botonCarrito.className='botonCarrito';
     botonCarrito.innerText='Finalizar compra'
     botonCarrito.addEventListener('click', finalizarCompra)
     carritoHTML.appendChild(botonCarrito)  
@@ -221,16 +232,26 @@ function mostrarCarrito(){
 }
 
 function finalizarCompra(){
-    document.body.innerHTML = '' //Limpiamos el body
     let carrito = JSON.parse(sessionStorage.getItem("Carrito"));
     let totalCompra = carrito.reduce((acumulador, el) => acumulador + el.precio*el.cantidad, 0)
-    let mensaje = document.createElement('div')
-    mensaje.innerHTML = `
-    Gracias por confiar en nosotros <br>
-    Su total es: $${totalCompra} <br>
-    El ID de su pedido es: dbsa`
-    document.body.appendChild(mensaje)
-}
+    Swal.fire({
+        title: "¿Desea finalizar la compra?",
+        showCancelButton: true,
+        confirmButtonColor: "#009900",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Continuar",
+        cancelButtonText:"Cancelar"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "Su pedido ya ha sido realizado. Gracias por confiar en nosotros.",
+            html: `El total de su compra es: $${totalCompra}.<br> En 30 minutos, su pedido estará listo para pasarlo a buscar.`,
+            icon: "success"
+            
+          });
+        }
+      });
+    }
 
 function eliminarItemCarrito(e){
     let boton = e.target; //Extraemos el boton que activo el evento
@@ -252,5 +273,8 @@ function limpiarCarrito(e){
 
 //Funciones del storage
 const guardarSesion = (clave, valor) => { sessionStorage.setItem(clave, valor) };
+
+//Funciones de fetch
+
 
 

@@ -1,0 +1,5 @@
+[
+    {"id":1,"gustos":"Pizza de Jamon y Queso","precio":1250,"dolarAntes":350},
+    {"id":2,"gustos":"Pizza Napolitana","precio":2000,"dolarAntes":350},
+    {"id":3,"gustos":"Pizza de Pollo","precio":2500,"dolarAntes":350}
+]
