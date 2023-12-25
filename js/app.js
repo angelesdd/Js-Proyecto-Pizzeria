@@ -109,8 +109,8 @@ function actualizarCartaAdmin (){
         cartaAdmin.innerHTML = cartaAdmin.innerHTML + `<br>
         <span>ID: ${el.id}</span><br>
         <span>Gusto: ${el.gustos}</span><br>
-        <span>Precio: ${el.precio}</span><br>
-        <span>Dolar: ${el.dolarAntes}</span><br>`
+        <span>Precio: $${el.precio}</span><br>
+        <span>Dolar: $${el.dolarAntes}</span><br>`
     })
 }
 
@@ -147,7 +147,7 @@ function actualizarCartaCompra(){
         card.className=`Card_${item.id}`
         card.innerHTML = 
         ` Gusto: ${item.gustos} <br>
-        Precio: ${item.precio}
+        Precio: $${item.precio}
         <input type="number" min="0.5" step="0.5" name="${item.id}" inputmode="numeric" id="Input_${item.id}" value="0">
         <input type="submit" id="agregarProducto_${item.id}" value="Agregar al carrito">
         <hr>
@@ -208,8 +208,8 @@ function mostrarCarrito(){
         itemCarrito.innerHTML =`
         Gusto: ${p.gustos}<br>
         Cantidad: ${p.cantidad}<br>
-        Precio: ${p.precio}<br>
-        Subtotal: ${p.cantidad*p.precio}<br><br>`
+        Precio: $${p.precio}<br>
+        Subtotal: $${p.cantidad*p.precio}<br><br>`
         contenidoCarrito.appendChild(itemCarrito)
         let botonItemCarrito = document.createElement('button')
         botonItemCarrito.id=`Boton_${i}`
@@ -245,7 +245,7 @@ function finalizarCompra(){
         if (result.isConfirmed) {
           Swal.fire({
             title: "Su pedido ya ha sido realizado. Gracias por confiar en nosotros.",
-            html: `El total de su compra es: $${totalCompra}.<br> En 30 minutos, su pedido estará listo para pasarlo a buscar.`,
+            html: `El total de su compra es: $${totalCompra}.<br> En 30 minutos su pedido estará listo para pasarlo a buscar.`,
             icon: "success"
             
           });
